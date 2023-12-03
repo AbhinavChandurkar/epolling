@@ -1,0 +1,14 @@
+@font-face {
+  font-family: 'AnticSlab-Regular';
+  src: local('AnticSlab-Regular'), url('../src/assets/Font/AnticSlab-Regular.ttf') format('truetype');
+  font-weight: bolder;
+  font-style: normal;
+}
+
+
+body {
+  background-color: #7071E8; 
+  margin: 0;
+  font-family: 'AnticSlab-Regular', sans-serif; 
+}
+
