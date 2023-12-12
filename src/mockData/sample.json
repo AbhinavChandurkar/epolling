@@ -1,0 +1,66 @@
+[
+  {
+    "name": "Satish Chipade",
+    "state": "Maharashtra",
+    "district": "pune",
+    "loksabha": "alandi",
+    "party": "BJP",
+    "votes": 1000
+  },
+  {
+    "name": "Mayur Chipade",
+    "state": "Maharashtra",
+    "district": "pune",
+    "loksabha": "alandi",
+    "party": "NCP",
+    "votes": 1000
+  },
+  {
+    "name": "bhikaji Chipade",
+    "state": "Maharashtra",
+    "district": "Goa-East",
+    "loksabha": "goa-east",
+    "party": "APP",
+    "votes": 1000
+  },
+  {
+    "name": "Mayur Chipade",
+    "state": "Goa",
+    "district": "Goa-East",
+    "loksabha": "goa-east",
+    "party": "BJP",
+    "votes": 1000
+  },
+  {
+    "name": "Satish Chipade",
+    "state": "Goa",
+    "district": "Goa-East",
+    "loksabha": "goa-east",
+    "party": "NCP",
+    "votes": 1000
+  },
+  {
+    "name": "Bhikaji Chipade",
+    "state": "Goa",
+    "district": "Goa-East",
+    "loksabha": "goa-east",
+    "party": "APP",
+    "votes": 1000
+  },
+  {
+    "name": "Mayur Satish Chipade",
+    "state": "UP",
+    "district": "UP-East",
+    "loksabha": "UP-east",
+    "party": "APP",
+    "votes": 1000
+  },
+  {
+    "name": "Mayur Satish Chipade",
+    "state": "UP",
+    "district": "UP-East",
+    "loksabha": "UP-east",
+    "party": "APP",
+    "votes": 1000
+  }
+]
