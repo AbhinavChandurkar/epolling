@@ -1,5 +1,4 @@
-import { useState } from "react";
-import candidateInfo from "../mockData/sample.json";
+import { useState, useEffect } from "react";
 import { SlPlus } from "react-icons/sl";
 
 const StateForm = () => {
@@ -7,36 +6,110 @@ const StateForm = () => {
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedLokSabha, setSelectedLokSabha] = useState("");
   const [filtredData, setFiltredData] = useState([]);
-
-  const states = ["Maharashtra", "Goa", "UP"];
-  const districts = ["pune", "Goa-East", "UP-East"];
-  const lokSabhas = ["alandi", "goa-east", "UP-east"];
+  const [data, setData] = useState([]);
+  const [states, setStates] = useState([]);
+  const [districts, setDistricts] = useState([]);
+  const [lokSabhas, setLokSabhas] = useState([]);
 
   const textColor = "#0F0F0F";
 
-  const handleClick = () => {
-    const filteredCandidates = candidateInfo.filter((candidate) => {
-      return (
-        candidate.state === selectedState &&
-        candidate.district === selectedDistrict &&
-        candidate.loksabha === selectedLokSabha
-      );
-    });
-    setFiltredData(filteredCandidates);
+  const handleClick = async () => {
+    // Check if all dropdowns are selected
+    if (selectedState && selectedDistrict && selectedLokSabha) {
+      try {
+        const response = await fetch(
+          `http://localhost:3000/getcandidates/${selectedState}/${selectedDistrict}/${selectedLokSabha}`
+        );
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const candidatesData = await response.json();
+        setFiltredData(candidatesData);
+      } catch (error) {
+        console.error("Error fetching candidates:", error);
+      }
+    }
   };
 
-  const handleVote = (candidateName, action) => {
-    const updatedData = filtredData.map((candidate) => {
-      if (candidate.name === candidateName) {
-        return {
-          ...candidate,
-          votes: action === "up" ? candidate.votes + 1 : candidate.votes - 1,
-        };
+  const handleVote = async (candidateId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/vote/${candidateId}`,
+        {
+          method: "POST",
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
       }
-      return candidate;
-    });
-    setFiltredData(updatedData);
+
+      // Refresh candidate data after voting
+      handleClick();
+    } catch (error) {
+      console.error("Error submitting vote:", error);
+    }
   };
+
+  //getting the data from the backend
+  const getData = async () => {
+    const response = await fetch("http://localhost:3000/getdata");
+    const data = await response.json();
+
+    //adding the state
+    const uniqueStates = [...new Set(data.map((candidate) => candidate.state))];
+    setStates(uniqueStates);
+
+    setData(data);
+  };
+
+  const handleStateChange = async (selectedState) => {
+    console.log("Selected State:", selectedState);
+    setSelectedState(selectedState);
+    setSelectedDistrict("");
+    setSelectedLokSabha("");
+    // Fetch districts based on the selected state
+    if (selectedState) {
+      try {
+        const response = await fetch(
+          `http://localhost:3000/getdistricts/${selectedState}`
+        );
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const districtData = await response.json();
+        setDistricts(districtData); // Make sure to set the districts state here
+      } catch (error) {
+        console.error("Error fetching districts:", error);
+      }
+    }
+  };
+
+  const handleDistrictChange = async (selectedDistrict) => {
+    console.log("Selected District:", selectedDistrict);
+    setSelectedDistrict(selectedDistrict);
+    setSelectedLokSabha("");
+
+    // Fetch Lok Sabha names based on the selected district
+    if (selectedDistrict) {
+      try {
+        const response = await fetch(
+          `http://localhost:3000/getlokSabhas/${selectedDistrict}`
+        );
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const lokSabhaData = await response.json();
+        setLokSabhas(lokSabhaData);
+      } catch (error) {
+        console.error("Error fetching Lok Sabha names:", error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
 
   return (
     <div className="flex items-center  h-screen">
@@ -52,9 +125,7 @@ const StateForm = () => {
           <select
             value={selectedState}
             onChange={(e) => {
-              setSelectedState(e.target.value);
-              setSelectedDistrict("");
-              setSelectedLokSabha("");
+              handleStateChange(e.target.value);
             }}
             className="p-2"
             style={{ color: textColor, width: "200px", height: "40px" }}
@@ -77,8 +148,7 @@ const StateForm = () => {
             <select
               value={selectedDistrict}
               onChange={(e) => {
-                setSelectedDistrict(e.target.value);
-                setSelectedLokSabha("");
+                handleDistrictChange(e.target.value);
               }}
               className="p-2"
               style={{ color: textColor, width: "200px", height: "40px" }}
@@ -144,27 +214,20 @@ const StateForm = () => {
               {/* Candidate Information */}
               <div className="flex flex-col">
                 <div className="text-xl font-semibold mb-2">
-                  {candidate.name}
+                  {candidate.name_of_candidate}
                 </div>
-                <div className="text-lg mb-2">{candidate.party}</div>
+                <div className="text-lg mb-2">{candidate.name_of_party}</div>
               </div>
 
               {/* Voting Buttons */}
               <div className="flex items-center ml-auto">
                 <button
                   className="bg-green-500 text-white p-2 rounded-full mr-2"
-                  onClick={() => handleVote(candidate.name, "up")}
+                  onClick={() => handleVote(candidate._id)}
                 >
                   <SlPlus />
                 </button>
-                {/* <button
-                  className="bg-red-500 text-white p-2 rounded-full"
-                  onClick={() => handleVote(candidate.name, "down")}
-                >
-                  <SlMinus />
-                </button> */}
               </div>
-
               {/* Total Votes */}
               <div className="ml-4">{`Total Votes: ${candidate.votes}`}</div>
             </div>
